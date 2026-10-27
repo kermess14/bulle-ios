@@ -1,0 +1,35 @@
+# Fabrique l'appli sur un Mac de GitHub à chaque modification, sans signature : le fichier Bulle.ipa (dans « Artifacts »
+# de la page de l'exécution) s'installe sur l'iPad avec Sideloadly et un identifiant Apple gratuit (voir LISEZ-MOI.md).
+name: Appli iPad / iPhone
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  ipa:
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+      - name: Projet Xcode (XcodeGen)
+        run: brew install xcodegen && xcodegen generate
+      - name: Fabrication (sans signature)
+        run: |
+          set -o pipefail
+          xcodebuild -project BulleBD.xcodeproj -scheme BulleBD -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build | tee build.log | grep -E "error:|warning: .*BulleBD|BUILD" || true
+          test -d build/Build/Products/Release-iphoneos/Bulle.app
+      - name: Paquet .ipa
+        run: |
+          mkdir Payload && cp -R build/Build/Products/Release-iphoneos/Bulle.app Payload/
+          zip -qry Bulle.ipa Payload
+      - uses: actions/upload-artifact@v5
+        with:
+          name: Bulle-ipa
+          path: Bulle.ipa
+          retention-days: 30
+      - uses: actions/upload-artifact@v5
+        if: failure()
+        with:
+          name: journal-de-fabrication
+          path: build.log

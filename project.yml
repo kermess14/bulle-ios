@@ -1,0 +1,56 @@
+# Projet Xcode décrit en texte : XcodeGen le fabrique (sur les Mac de GitHub), pas besoin de Mac chez soi.
+name: BulleBD
+options:
+  bundleIdPrefix: fr.kermess
+  deploymentTarget:
+    iOS: "16.0"
+packages:
+  ZIPFoundation:
+    url: https://github.com/weichsel/ZIPFoundation
+    from: 0.9.19
+targets:
+  BulleBD:
+    type: application
+    platform: iOS
+    sources: [BulleBD]
+    dependencies:
+      - package: ZIPFoundation
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: fr.kermess.bullebd
+        PRODUCT_NAME: Bulle
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SWIFT_VERSION: "5.0"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    info:
+      path: BulleBD/Info.plist
+      properties:
+        CFBundleDisplayName: Bulle
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: true
+        UIFileSharingEnabled: true                  # les BD de l'appli visibles dans l'app Fichiers (« Sur mon iPad › Bulle »)
+        LSSupportsOpeningDocumentsInPlace: true
+        UISupportsDocumentBrowser: false
+        UIRequiresFullScreen: false
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+        UISupportedInterfaceOrientations~ipad: [UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+        UTImportedTypeDeclarations:
+          - UTTypeIdentifier: fr.kermess.bullebd.cbz
+            UTTypeDescription: Bande dessinée (CBZ)
+            UTTypeConformsTo: [public.zip-archive, public.data]
+            UTTypeTagSpecification:
+              public.filename-extension: [cbz]
+              public.mime-type: [application/vnd.comicbook+zip]
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: Bande dessinée
+            CFBundleTypeRole: Viewer
+            LSHandlerRank: Alternate
+            LSItemContentTypes: [fr.kermess.bullebd.cbz, public.zip-archive, com.adobe.pdf]
+schemes:
+  BulleBD:
+    build:
+      targets:
+        BulleBD: all
